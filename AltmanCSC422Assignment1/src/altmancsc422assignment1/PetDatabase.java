@@ -25,7 +25,9 @@ public class PetDatabase {
             switch (getUserChoice()){
                 case 1 -> showAllPets();
                 case 2 -> addPets();
-                case 3 -> end = true;
+                case 3 -> searchPetsByName();
+                case 4 -> searchPetsByAge();
+                case 5 -> end = true;
             }
         }
         
@@ -42,7 +44,9 @@ public class PetDatabase {
                            What wouldyou like to do?
                             1) View all pets
                             2) Add more pets
-                            3) Exit program""");
+                            3) Search for pet by name
+                            4) Search for pet by age
+                            5) Exit program""");
         System.out.print("Your choice: ");
         
         //Validate input
@@ -78,8 +82,7 @@ public class PetDatabase {
                     return;
                 
                 //Parse input
-                String name = input[0].substring(0,1).toUpperCase() //Upper case first letter
-                        + input[0].substring(1).toLowerCase(); //Lower case for rest of name
+                String name = input[0].toLowerCase(); //Store name as lower case
                 int age = Integer.parseInt(input[1]);
                 
                 //Add pet to pets array
@@ -103,12 +106,65 @@ public class PetDatabase {
         //Print number of rows
         System.out.println("" + pets.size() + " rows in set.");
     }
+    private static void searchPetsByName(){
+        //Get user input
+        System.out.print("Enter a name to search: ");
+        String input = scnr.next();
+        scnr.nextLine();
+        
+        //Track number of elements fitting search criteria
+        int nameCount = 0;
+        //Print header
+        printTableHeader();
+        //Print all rows
+        for (int index = 0; index < pets.size(); index++){
+            if (input.toLowerCase().equals(pets.get(index).getName())){
+                printTableRow(index, pets.get(index).getName(), pets.get(index).getAge());
+                nameCount++;
+            }
+        }
+        //Print footer
+        printTableFooter();
+        //Print number of rows
+        System.out.println("" + nameCount + " rows in set.");
+    }
+    private static void searchPetsByAge(){
+         //Get user input
+        System.out.print("Enter age to search: ");
+        try{
+            int input = scnr.nextInt();
+            scnr.nextLine();
+            
+            //Track number of elements fitting search criteria
+            int ageCount = 0;
+            //Print header
+            printTableHeader();
+            //Print all rows
+            for (int index = 0; index < pets.size(); index++){
+                if (input== pets.get(index).getAge()){
+                    printTableRow(index, pets.get(index).getName(), pets.get(index).getAge());
+                    ageCount++;
+                }
+            }
+            //Print footer
+            printTableFooter();
+            //Print number of rows
+            System.out.println("" + ageCount + " rows in set.");
+        }
+        catch (Exception e){
+            scnr.nextLine();
+            System.out.println(e.getClass().getSimpleName());
+        }
+    }
     private static void printTableHeader(){
         System.out.println("+----------------------+");
         System.out.printf("|%3s | %-10s|%4s |\n", "ID", "NAME", "AGE");
         System.out.println("+----------------------+");
     }
     private static void printTableRow(int id, String name, int age){
+        //Modify name so that the first letter is capitalized
+        name = name.substring(0,1).toUpperCase() + name.substring(1);
+        
         //Prints id, name, and age into table with sizes matching the assignment criteria
         System.out.printf("|%3s | %-10.10s|%4s |\n", id, name, age);
     }
