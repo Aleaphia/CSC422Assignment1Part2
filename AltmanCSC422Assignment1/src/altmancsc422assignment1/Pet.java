@@ -26,4 +26,8 @@ public class Pet {
     //Set methods
     public void setName(String name){this.name = name;}
     public void setAge(int age){this.age = age;}
+    
+    @Override public String toString(){
+        return name.substring(0,1).toUpperCase() + name.substring(1) + " " + age;
+    }
 }

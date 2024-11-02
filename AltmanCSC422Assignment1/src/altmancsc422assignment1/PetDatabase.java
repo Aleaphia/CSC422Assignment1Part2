@@ -25,9 +25,11 @@ public class PetDatabase {
             switch (getUserChoice()){
                 case 1 -> showAllPets();
                 case 2 -> addPets();
-                case 3 -> searchPetsByName();
-                case 4 -> searchPetsByAge();
-                case 5 -> end = true;
+                case 3 -> updatePet();
+                case 4 -> removePet();
+                case 5 -> searchPetsByName();
+                case 6 -> searchPetsByAge();
+                case 7 -> end = true;
             }
         }
         
@@ -41,12 +43,14 @@ public class PetDatabase {
         //Prompt user choice
         System.out.println("""
                            
-                           What wouldyou like to do?
+                           What would you like to do?
                             1) View all pets
                             2) Add more pets
-                            3) Search for pet by name
-                            4) Search for pet by age
-                            5) Exit program""");
+                            3) Update an existing pet
+                           `4) Remove an existing pet
+                            5) Search for pet by name
+                            6) Search for pet by age
+                            7) Exit program""");
         System.out.print("Your choice: ");
         
         //Validate input
@@ -105,6 +109,51 @@ public class PetDatabase {
         printTableFooter();
         //Print number of rows
         System.out.println("" + pets.size() + " rows in set.");
+    }
+    private static void updatePet(){
+        //Display Pet list
+        showAllPets();
+        //Prompt user input
+        System.out.print("Enter the pet ID to update: ");
+        //Collect input
+        int index = scnr.nextInt();
+        //Clear remaining input line
+        scnr.nextLine();
+        
+        if(index >= 0 && index < pets.size()){
+            //Prompt user
+            System.out.print("Enter a new name and a new age: ");
+            
+            //Get input from user
+            String[] input = scnr.nextLine().split(" ");
+
+            //Parse input
+            String name = input[0].toLowerCase(); //Store name as lower case
+            int age = Integer.parseInt(input[1]);
+            
+            System.out.print(pets.get(index) + " changed to ");
+            
+            //Update pet
+            pets.get(index).setName(name);
+            pets.get(index).setAge(age);
+            
+            System.out.println(pets.get(index));
+        }
+    }
+    private static void removePet(){
+        //Display Pet list
+        showAllPets();
+        //Prompt user input
+        System.out.print("Enter the pet ID to remove: ");
+        //Collect input
+        int input = scnr.nextInt();
+        //Clear remaining input line
+        scnr.nextLine();
+        
+        if(input >= 0 && input < pets.size()){
+            System.out.println(pets.get(input) + " is removed.");
+            pets.remove(input);
+        }
     }
     private static void searchPetsByName(){
         //Get user input
