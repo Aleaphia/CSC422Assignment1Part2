@@ -6,16 +6,22 @@ I certify, that this computer program submitted by me is all of my own work.
 Signed: Shoshana Altman
 */
 package altmancsc422assignment1;
+import java.io.*;
 import java.util.*;
 
 public class PetDatabase {
     //Attributes ---------------------------------------------------------------
     //Scanner object
-    public static Scanner scnr = new Scanner(System.in);
+    public static Scanner userInputScnr = new Scanner(System.in);
+    //Filename
+    public final static String FILENAME = "pets.txt";
     //Array for holding Pet objects
     private final static ArrayList<Pet> pets = new ArrayList<>();
     
     public static void main(String[] args) {
+        //Load database
+        loadDatabase();
+        
         //Welcome message
         System.out.println("Pet Database Program.");
         
@@ -32,6 +38,9 @@ public class PetDatabase {
                 case 7 -> end = true;
             }
         }
+        
+        //Save database
+        saveDatabase();
         
         //Ending message
         System.out.println("Goodbye!");
@@ -57,7 +66,7 @@ public class PetDatabase {
         boolean validInput = false;
         while(!validInput){
             try{
-                userChoice = scnr.nextInt();
+                userChoice = userInputScnr.nextInt();
                 validInput = true; //valid input found
             }
             catch(Exception e){
@@ -65,7 +74,7 @@ public class PetDatabase {
                 System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
             }
             //Clear input line
-            scnr.nextLine();
+            userInputScnr.nextLine();
         }
         
         System.out.println();//Formatting
@@ -79,24 +88,28 @@ public class PetDatabase {
             //Exception handling
             try {
                 //Get input from user
-                String[] input = scnr.nextLine().split(" ");
-                
+                String[] input = userInputScnr.nextLine().split(" ");
+
                 //Check for exit condition
                 if (input[0].equals("done"))
                     return;
                 
-                //Parse input
-                String name = input[0].toLowerCase(); //Store name as lower case
-                int age = Integer.parseInt(input[1]);
-                
-                //Add pet to pets array
-                pets.add(new Pet(name, age));
+                //Add pet to database
+                addPetInfoToDatabase(input);
             }
             catch (Exception e){
                 //Print out message for any exception
                 System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
             }
         }
+    }
+    private static void addPetInfoToDatabase(String[] petInfo){
+        //Parse input
+        String name = petInfo[0].toLowerCase(); //Store name as lower case
+        int age = Integer.parseInt(petInfo[1]);
+
+        //Add pet to pets array
+        pets.add(new Pet(name, age));
     }
     private static void showAllPets(){
         //Print header
@@ -116,16 +129,16 @@ public class PetDatabase {
         //Prompt user input
         System.out.print("Enter the pet ID to update: ");
         //Collect input
-        int index = scnr.nextInt();
+        int index = userInputScnr.nextInt();
         //Clear remaining input line
-        scnr.nextLine();
+        userInputScnr.nextLine();
         
         if(index >= 0 && index < pets.size()){
             //Prompt user
             System.out.print("Enter a new name and a new age: ");
             
             //Get input from user
-            String[] input = scnr.nextLine().split(" ");
+            String[] input = userInputScnr.nextLine().split(" ");
 
             //Parse input
             String name = input[0].toLowerCase(); //Store name as lower case
@@ -146,9 +159,9 @@ public class PetDatabase {
         //Prompt user input
         System.out.print("Enter the pet ID to remove: ");
         //Collect input
-        int input = scnr.nextInt();
+        int input = userInputScnr.nextInt();
         //Clear remaining input line
-        scnr.nextLine();
+        userInputScnr.nextLine();
         
         if(input >= 0 && input < pets.size()){
             System.out.println(pets.get(input) + " is removed.");
@@ -158,8 +171,8 @@ public class PetDatabase {
     private static void searchPetsByName(){
         //Get user input
         System.out.print("Enter a name to search: ");
-        String input = scnr.next();
-        scnr.nextLine();
+        String input = userInputScnr.next();
+        userInputScnr.nextLine();
         
         //Track number of elements fitting search criteria
         int nameCount = 0;
@@ -181,8 +194,8 @@ public class PetDatabase {
          //Get user input
         System.out.print("Enter age to search: ");
         try{
-            int input = scnr.nextInt();
-            scnr.nextLine();
+            int input = userInputScnr.nextInt();
+            userInputScnr.nextLine();
             
             //Track number of elements fitting search criteria
             int ageCount = 0;
@@ -201,10 +214,44 @@ public class PetDatabase {
             System.out.println("" + ageCount + " rows in set.");
         }
         catch (Exception e){
-            scnr.nextLine();
+            userInputScnr.nextLine();
             System.out.println(e.getClass().getSimpleName());
         }
     }
+    
+    
+    private static void loadDatabase(){
+        //Open file with 'try using' statement
+        try (FileInputStream  fileStream = new FileInputStream (FILENAME);//Open file
+            Scanner fileScnr = new Scanner(fileStream)//Create Scanner object to read file
+                ){
+            //Read each line from file
+            while( fileScnr.hasNextLine()){
+                //Get input from file
+                addPetInfoToDatabase(fileScnr.nextLine().trim().split(" "));
+            }
+        }
+        catch (Exception e){
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+    }
+    private static void saveDatabase(){
+        //Write database to file
+        try (FileOutputStream  fileStream = new FileOutputStream (FILENAME);//Open file
+            PrintWriter fileWriter = new PrintWriter(fileStream)//Create PrintWriter
+                ){
+            
+            //Write database to file
+            for (int index = 0; index < pets.size(); index++) {
+                fileWriter.println(pets.get(index));
+            }
+        }
+        catch (Exception e){
+            System.out.println(e.getClass().getSimpleName() + ": " + e.getMessage());
+        }
+    }
+    
+    
     private static void printTableHeader(){
         System.out.println("+----------------------+");
         System.out.printf("|%3s | %-10s|%4s |\n", "ID", "NAME", "AGE");
